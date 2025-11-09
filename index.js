@@ -30,14 +30,19 @@ async function run() {
     const allCollection = pawsMart.collection("petsandsupplies");
 
     app.get("/recent-pets-and-supplies", async (req, res) => {
-      const cursor = allCollection.find().sort({ created_at: -1 }).limit(6);
+      const cursor = allCollection.find().sort({ date: -1 }).limit(6);
       const result = await cursor.toArray();
       res.send(result);
     });
     app.get("/pets-and-supplies", async (req, res) => {
-      const cursor = allCollection.find().sort({ created_at: -1 });
+      const cursor = allCollection.find().sort({ date: -1 });
       const result = await cursor.toArray();
       res.send(result);
+    });
+    app.post("/add-listing", async (req, res) => {
+      const objectData = req.body;
+      const result = await allCollection.insertOne(objectData);
+      res.status(201).send(result);
     });
 
     console.log(
