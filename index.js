@@ -26,7 +26,20 @@ async function run() {
   try {
     await client.connect();
 
-    await client.db("admin").command({ ping: 1 });
+    const pawsMart = client.db("pawsmart");
+    const allCollection = pawsMart.collection("petsandsupplies");
+
+    app.get("/recent-pets-and-supplies", async (req, res) => {
+      const cursor = allCollection.find().sort({ created_at: -1 }).limit(6);
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+    app.get("/pets-and-supplies", async (req, res) => {
+      const cursor = allCollection.find().sort({ created_at: -1 });
+      const result = await cursor.toArray();
+      res.send(result);
+    });
+
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
     );
