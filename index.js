@@ -30,18 +30,18 @@ async function run() {
     const allCollection = pawsMart.collection("petsandsupplies");
     const orderCollection = pawsMart.collection("orders");
 
-    app.get("/recent-pets-and-supplies", async (req, res) => {
+    app.get("/recent-listings", async (req, res) => {
       const cursor = allCollection.find().sort({ date: -1 }).limit(6);
       const result = await cursor.toArray();
       res.send(result);
     });
-    app.get("/pets-and-supplies", async (req, res) => {
+    app.get("/listings", async (req, res) => {
       const cursor = allCollection.find().sort({ date: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
 
-    app.get("/pets-and-supplies/:id", async (req, res) => {
+    app.get("/listings/:id", async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await allCollection.findOne(query);
@@ -54,7 +54,7 @@ async function run() {
       res.status(201).send(result);
     });
 
-    app.post("/order-pet-or-supplies", async (req, res) => {
+    app.post("/order", async (req, res) => {
       const orderObject = req.body;
       const result = await orderCollection.insertOne(orderObject);
       res.send(result);
@@ -66,7 +66,7 @@ async function run() {
       const result = await allCollection.find(query).toArray();
       res.send(result);
     });
-    app.patch("/pets-and-supplies/:id", async (req, res) => {
+    app.patch("/listings/:id", async (req, res) => {
       const updateInfo = req.body;
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
@@ -74,6 +74,12 @@ async function run() {
         $set: updateInfo,
       };
       const result = await allCollection.updateOne(query, updateQuery);
+      res.send(result);
+    });
+    app.delete("/listings/:id", async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const result = await allCollection.deleteOne(query);
       res.send(result);
     });
 
