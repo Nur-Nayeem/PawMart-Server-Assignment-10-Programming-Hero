@@ -28,6 +28,7 @@ async function run() {
 
     const pawsMart = client.db("pawsmart");
     const allCollection = pawsMart.collection("petsandsupplies");
+    const orderCollection = pawsMart.collection("orders");
 
     app.get("/recent-pets-and-supplies", async (req, res) => {
       const cursor = allCollection.find().sort({ date: -1 }).limit(6);
@@ -42,11 +43,7 @@ async function run() {
 
     app.get("/pets-and-supplies/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
-
       const query = { _id: new ObjectId(id) };
-      console.log(query);
-
       const result = await allCollection.findOne(query);
       res.send(result);
     });
@@ -55,6 +52,12 @@ async function run() {
       const objectData = req.body;
       const result = await allCollection.insertOne(objectData);
       res.status(201).send(result);
+    });
+
+    app.post("/order-pet-or-supplies", async (req, res) => {
+      const orderObject = req.body;
+      const result = await orderCollection.insertOne(orderObject);
+      res.send(result);
     });
 
     console.log(
