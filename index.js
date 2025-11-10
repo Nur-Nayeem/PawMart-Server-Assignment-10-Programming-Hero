@@ -63,7 +63,7 @@ async function run() {
     app.get("/my-listings", async (req, res) => {
       const email = req.query.email;
       const query = { email };
-      const result = await orderCollection.find(query).toArray();
+      const result = await allCollection.find(query).toArray();
       res.send(result);
     });
 
