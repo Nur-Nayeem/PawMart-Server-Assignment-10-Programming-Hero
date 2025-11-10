@@ -66,6 +66,16 @@ async function run() {
       const result = await allCollection.find(query).toArray();
       res.send(result);
     });
+    app.patch("/pets-and-supplies/:id", async (req, res) => {
+      const updateInfo = req.body;
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) };
+      const updateQuery = {
+        $set: updateInfo,
+      };
+      const result = await allCollection.updateOne(query, updateQuery);
+      res.send(result);
+    });
 
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!"
