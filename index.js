@@ -35,9 +35,26 @@ async function run() {
       const result = await cursor.toArray();
       res.send(result);
     });
+    app.get("/search-listings", async (req, res) => {
+      const search = req.query.search;
+      const result = await allCollection
+        .find({ category: { $regex: search, $options: "i" } })
+        .toArray();
+      res.send(result);
+    });
+
     app.get("/listings", async (req, res) => {
-      const cursor = allCollection.find().sort({ date: -1 });
-      const result = await cursor.toArray();
+      const category = req.query.category;
+      let query = {};
+
+      if (category) {
+        query = { category };
+      }
+
+      const result = await allCollection
+        .find(query)
+        .sort({ date: -1 })
+        .toArray();
       res.send(result);
     });
 
