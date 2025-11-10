@@ -59,6 +59,12 @@ async function run() {
       const result = await orderCollection.insertOne(orderObject);
       res.send(result);
     });
+    app.get("/order", async (req, res) => {
+      const email = req.query.email;
+      query = { email };
+      const result = await orderCollection.find(query).toArray();
+      res.send(result);
+    });
 
     app.get("/my-listings", async (req, res) => {
       const email = req.query.email;
@@ -66,14 +72,14 @@ async function run() {
       const result = await allCollection.find(query).toArray();
       res.send(result);
     });
-    app.patch("/listings/:id", async (req, res) => {
+    app.patch("/update-listing/:id", async (req, res) => {
       const updateInfo = req.body;
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
-      const updateQuery = {
+      const updateListing = {
         $set: updateInfo,
       };
-      const result = await allCollection.updateOne(query, updateQuery);
+      const result = await allCollection.updateOne(query, updateListing);
       res.send(result);
     });
     app.delete("/listings/:id", async (req, res) => {
