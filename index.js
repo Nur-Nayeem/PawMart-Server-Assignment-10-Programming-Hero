@@ -1,12 +1,19 @@
 const express = require("express");
 const cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const admin = require("firebase-admin");
+const serviceAccount = require("./firebaseAdminSdk.json");
+
 require("dotenv").config();
 const app = express();
 const port = 4000;
 
 app.use(cors());
 app.use(express.json());
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
 app.get("/", (req, res) => {
   res.send("server is runnig");
@@ -21,6 +28,20 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+const verifyTokenWithFirebase = async (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+  const token = authorization.split(" ")[1];
+  if (!token) {
+    return res.status(401).send({ message: "unauthorized access" });
+  }
+  const userInfo = await admin.auth().verifyIdToken(token);
+  req.token_email = userInfo.email;
+  next();
+};
 
 async function run() {
   try {
@@ -65,7 +86,7 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/add-listing", async (req, res) => {
+    app.post("/add-listing", verifyTokenWithFirebase, async (req, res) => {
       const objectData = req.body;
       const result = await allCollection.insertOne(objectData);
       res.status(201).send(result);
@@ -83,23 +104,27 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/my-listings", async (req, res) => {
+    app.get("/my-listings", verifyTokenWithFirebase, async (req, res) => {
       const email = req.query.email;
       const query = { email };
       const result = await allCollection.find(query).toArray();
       res.send(result);
     });
-    app.patch("/update-listing/:id", async (req, res) => {
-      const updateInfo = req.body;
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const updateListing = {
-        $set: updateInfo,
-      };
-      const result = await allCollection.updateOne(query, updateListing);
-      res.send(result);
-    });
-    app.delete("/listings/:id", async (req, res) => {
+    app.patch(
+      "/update-listing/:id",
+      verifyTokenWithFirebase,
+      async (req, res) => {
+        const updateInfo = req.body;
+        const id = req.params.id;
+        const query = { _id: new ObjectId(id) };
+        const updateListing = {
+          $set: updateInfo,
+        };
+        const result = await allCollection.updateOne(query, updateListing);
+        res.send(result);
+      }
+    );
+    app.delete("/listings/:id", verifyTokenWithFirebase, async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const result = await allCollection.deleteOne(query);
