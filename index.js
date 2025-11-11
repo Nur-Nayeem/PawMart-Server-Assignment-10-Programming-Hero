@@ -38,7 +38,7 @@ async function run() {
     app.get("/search-listings", async (req, res) => {
       const search = req.query.search;
       const result = await allCollection
-        .find({ category: { $regex: search, $options: "i" } })
+        .find({ name: { $regex: search, $options: "i" } })
         .toArray();
       res.send(result);
     });
