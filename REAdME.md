@@ -44,7 +44,7 @@ PawsMart is a modern React-based marketplace for pets and pet-related products, 
 - **Database:** MongoDB
 - **Authentication:** Firebase Auth (Email/Password & Google)
 
-## 📦 NPM Packages Used Fo Backend
+## 📦 NPM Packages Used For Backend
 
 - mongodb
 - firebase-admin
