@@ -57,7 +57,7 @@ async function run() {
     const orderCollection = pawsMart.collection("orders");
 
     app.get("/recent-listings", async (req, res) => {
-      const cursor = allCollection.find().sort({ date: -1 }).limit(6);
+      const cursor = allCollection.find().sort({ createdAt: -1 }).limit(6);
       const result = await cursor.toArray();
       res.send(result);
     });
@@ -94,6 +94,7 @@ async function run() {
 
     app.post("/add-listing", verifyTokenWithFirebase, async (req, res) => {
       const objectData = req.body;
+      objectData.createdAt = new Date();
       const result = await allCollection.insertOne(objectData);
       res.status(201).send(result);
     });
