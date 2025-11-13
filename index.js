@@ -244,6 +244,10 @@ async function run() {
             return res.status(400).send({ message: "Missing id or email" });
           }
 
+          if (updateInfo.category === "Pets") {
+            updateInfo.price = 0;
+          }
+
           // Verify user
           if (email !== req.token_email) {
             return res.status(403).send({ message: "Forbidden access" });
