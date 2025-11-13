@@ -123,9 +123,7 @@ async function run() {
         }
 
         const query = { _id: objectId };
-        const result = await allCollection
-          .sort({ createdAt: -1 })
-          .findOne(query);
+        const result = await allCollection.findOne(query);
 
         if (!result) {
           return res.status(404).send({ message: "Listing not found" });
