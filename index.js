@@ -148,6 +148,10 @@ async function run() {
           return res.status(403).send({ message: "Forbidden access" });
         }
 
+        if (objectData.category === "Pets") {
+          objectData.price = 0;
+        }
+
         objectData.createdAt = new Date();
 
         const result = await allCollection.insertOne(objectData);
@@ -168,6 +172,10 @@ async function run() {
 
         if (!orderObject || Object.keys(orderObject).length === 0) {
           return res.status(400).send({ message: "Order data is required" });
+        }
+
+        if (orderObject.category === "Pets") {
+          orderObject.price = 0;
         }
 
         const result = await orderCollection.insertOne(orderObject);
