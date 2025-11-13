@@ -123,7 +123,9 @@ async function run() {
         }
 
         const query = { _id: objectId };
-        const result = await allCollection.findOne(query);
+        const result = await allCollection
+          .sort({ createdAt: -1 })
+          .findOne(query);
 
         if (!result) {
           return res.status(404).send({ message: "Listing not found" });
@@ -210,7 +212,10 @@ async function run() {
           return res.status(403).send({ message: "Forbidden access" });
         }
         const query = { email };
-        const result = await allCollection.find(query).toArray();
+        const result = await allCollection
+          .find(query)
+          .sort({ createdAt: -1 })
+          .toArray();
         res.send(result);
       } catch (error) {
         console.error("Error fetching listings:", error);
