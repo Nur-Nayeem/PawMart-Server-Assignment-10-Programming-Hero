@@ -1,8 +1,8 @@
-# PawsMart 🐾
+# PawMart 🐾
 
-**Live Site:** [[PawsMart Website](https://pawsmart-79833.web.app)]
+**Live Site:** [[PawMart Website](https://pawsmart-79833.web.app)]
 
-PawsMart is a modern React-based marketplace for pets and pet-related products, designed to help pet lovers adopt pets, buy pet food, accessories, and care products, all in one place.
+PawMart is a modern React-based marketplace for pets and pet-related products, designed to help pet lovers adopt pets, buy pet food, accessories, and care products, all in one place.
 
 ## Features
 
