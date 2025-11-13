@@ -43,7 +43,9 @@ const verifyTokenWithFirebase = async (req, res, next) => {
   if (!token) {
     return res.status(401).send({ message: "unauthorized access" });
   }
-  await admin.auth().verifyIdToken(token);
+  const userInfo = await admin.auth().verifyIdToken(token);
+
+  req.token_email = userInfo.email;
 
   next();
 };
@@ -57,85 +59,223 @@ async function run() {
     const orderCollection = pawsMart.collection("orders");
 
     app.get("/recent-listings", async (req, res) => {
-      const cursor = allCollection.find().sort({ createdAt: -1 }).limit(6);
-      const result = await cursor.toArray();
-      res.send(result);
+      try {
+        const cursor = allCollection.find().sort({ createdAt: -1 }).limit(6);
+        const result = await cursor.toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching recent listings:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
 
     app.get("/search-listings", async (req, res) => {
-      const search = req.query.search;
-      const result = await allCollection
-        .find({ name: { $regex: search, $options: "i" } })
-        .toArray();
-      res.send(result);
+      try {
+        const search = req.query.search;
+        if (!search) {
+          return res.status(400).send({ message: "Search query is required" });
+        }
+        const result = await allCollection
+          .find({ name: { $regex: search, $options: "i" } })
+          .toArray();
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error searching listings:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
 
     app.get("/listings", async (req, res) => {
-      const category = req.query.category;
-      let query = {};
+      try {
+        const category = req.query.category;
+        let query = {};
 
-      if (category) {
-        query = { category };
+        if (category) {
+          query = { category };
+        }
+
+        const result = await allCollection
+          .find(query)
+          .sort({ createdAt: -1 })
+          .toArray();
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+        res.status(500).send({ message: "Internal Server Error" });
       }
-
-      const result = await allCollection
-        .find(query)
-        .sort({ date: -1 })
-        .toArray();
-      res.send(result);
     });
 
     app.get("/listings/:id", async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await allCollection.findOne(query);
-      res.send(result);
+      try {
+        const id = req.params.id;
+
+        if (!id) {
+          return res.status(400).send({ message: "Listing ID is required" });
+        }
+
+        let objectId;
+        try {
+          objectId = new ObjectId(id);
+        } catch (error) {
+          return res.status(400).send({ message: "Invalid listing ID" });
+        }
+
+        const query = { _id: objectId };
+        const result = await allCollection.findOne(query);
+
+        if (!result) {
+          return res.status(404).send({ message: "Listing not found" });
+        }
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching listing:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
 
     app.post("/add-listing", verifyTokenWithFirebase, async (req, res) => {
-      const objectData = req.body;
-      objectData.createdAt = new Date();
-      const result = await allCollection.insertOne(objectData);
-      res.status(201).send(result);
+      try {
+        const objectData = req.body;
+
+        if (!objectData || Object.keys(objectData).length === 0) {
+          return res.status(400).send({ message: "Listing data is required" });
+        }
+
+        if (objectData.email !== req.token_email) {
+          return res.status(403).send({ message: "Forbidden access" });
+        }
+
+        objectData.createdAt = new Date();
+
+        const result = await allCollection.insertOne(objectData);
+
+        res.status(201).send({
+          message: "Listing added successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Error adding listing:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
 
     app.post("/order", async (req, res) => {
-      const orderObject = req.body;
-      const result = await orderCollection.insertOne(orderObject);
-      res.send(result);
+      try {
+        const orderObject = req.body;
+
+        if (!orderObject || Object.keys(orderObject).length === 0) {
+          return res.status(400).send({ message: "Order data is required" });
+        }
+
+        const result = await orderCollection.insertOne(orderObject);
+
+        res.status(201).send({
+          message: "Order placed successfully",
+          insertedId: result.insertedId,
+        });
+      } catch (error) {
+        console.error("Error creating order:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
+
     app.get("/order", async (req, res) => {
-      const email = req.query.email;
-      query = { email };
-      const result = await orderCollection.find(query).toArray();
-      res.send(result);
+      try {
+        const email = req.query.email;
+
+        if (!email) {
+          return res.status(400).send({ message: "Missing email" });
+        }
+
+        const query = { email };
+        const result = await orderCollection.find(query).toArray();
+
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching orders:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
 
     app.get("/my-listings", verifyTokenWithFirebase, async (req, res) => {
-      const email = req.query.email;
-      const query = { email };
-      const result = await allCollection.find(query).toArray();
-      res.send(result);
+      try {
+        const email = req.query.email;
+        if (!email) {
+          return res.status(400).send({ message: "Missing email" });
+        }
+        if (email !== req.token_email) {
+          return res.status(403).send({ message: "Forbidden access" });
+        }
+        const query = { email };
+        const result = await allCollection.find(query).toArray();
+        res.send(result);
+      } catch (error) {
+        console.error("Error fetching listings:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
     app.patch(
       "/update-listing/:id",
       verifyTokenWithFirebase,
       async (req, res) => {
-        const updateInfo = req.body;
-        const id = req.params.id;
-        const query = { _id: new ObjectId(id) };
-        const updateListing = {
-          $set: updateInfo,
-        };
-        const result = await allCollection.updateOne(query, updateListing);
-        res.send(result);
+        try {
+          const updateInfo = req.body;
+          const id = req.params.id;
+          const email = req.query.email;
+
+          if (!id || !email) {
+            return res.status(400).send({ message: "Missing id or email" });
+          }
+
+          // Verify user
+          if (email !== req.token_email) {
+            return res.status(403).send({ message: "Forbidden access" });
+          }
+
+          const query = { _id: new ObjectId(id), email };
+          const updateListing = { $set: updateInfo };
+
+          const result = await allCollection.updateOne(query, updateListing);
+
+          if (result.matchedCount === 0) {
+            return res
+              .status(404)
+              .send({ message: "Listing not found or unauthorized" });
+          }
+
+          res.send(result);
+        } catch (error) {
+          console.error(error);
+          res.status(500).send({ message: "Internal Server Error" });
+        }
       }
     );
     app.delete("/listings/:id", verifyTokenWithFirebase, async (req, res) => {
-      const id = req.params.id;
-      const query = { _id: new ObjectId(id) };
-      const result = await allCollection.deleteOne(query);
-      res.send(result);
+      try {
+        const id = req.params.id;
+        const email = req.query.email;
+
+        if (!id || !email) {
+          return res.status(400).send({ message: "Missing id or email" });
+        }
+        if (email !== req.token_email) {
+          return res.status(403).send({ message: "Forbidden access" });
+        }
+        const query = { _id: new ObjectId(id), email };
+        const result = await allCollection.deleteOne(query);
+        if (result.deletedCount === 0) {
+          return res
+            .status(404)
+            .send({ message: "Listing not found or unauthorized" });
+        }
+        res.send({ message: "Listing deleted successfully", result });
+      } catch (error) {
+        console.error("Delete error:", error);
+        res.status(500).send({ message: "Internal Server Error" });
+      }
     });
 
     // await client.db("admin").command({ ping: 1 });
