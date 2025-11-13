@@ -191,7 +191,10 @@ async function run() {
         }
 
         const query = { email };
-        const result = await orderCollection.find(query).toArray();
+        const result = await orderCollection
+          .find(query)
+          .sort({ createdAt: -1 })
+          .toArray();
 
         res.send(result);
       } catch (error) {
