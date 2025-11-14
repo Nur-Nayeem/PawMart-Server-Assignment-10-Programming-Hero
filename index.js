@@ -58,49 +58,35 @@ async function run() {
     const allCollection = pawsMart.collection("petsandsupplies");
     const orderCollection = pawsMart.collection("orders");
 
-    app.get("/recent-listings", async (req, res) => {
-      try {
-        const cursor = allCollection.find().sort({ createdAt: -1 }).limit(6);
-        const result = await cursor.toArray();
-        res.send(result);
-      } catch (error) {
-        console.error("Error fetching recent listings:", error);
-        res.status(500).send({ message: "Internal Server Error" });
-      }
-    });
-
-    app.get("/search-listings", async (req, res) => {
-      try {
-        const search = req.query.search;
-        if (!search) {
-          return res.status(400).send({ message: "Search query is required" });
-        }
-        const result = await allCollection
-          .find({ name: { $regex: search, $options: "i" } })
-          .toArray();
-
-        res.send(result);
-      } catch (error) {
-        console.error("Error searching listings:", error);
-        res.status(500).send({ message: "Internal Server Error" });
-      }
-    });
-
     app.get("/listings", async (req, res) => {
       try {
-        const category = req.query.category;
+        const { category, search, limit = 0, skip = 0, recent } = req.query;
         let query = {};
 
         if (category) {
-          query = { category };
+          query.category = category;
         }
+        if (search) {
+          query.name = { $regex: search, $options: "i" };
+        }
+        const sort = {};
+        if (recent == "true") {
+          sort.createdAt = -1;
+        }
+        // sort.createdAt = -1;
 
         const result = await allCollection
           .find(query)
-          .sort({ createdAt: -1 })
+          .sort(sort)
+          .limit(Number(limit))
+          .skip(Number(skip))
+          .project({ description: 0, email: 0 })
           .toArray();
 
-        res.send(result);
+        const count = await allCollection.countDocuments(query);
+
+        // res.send(result);
+        res.send({ result, total: count });
       } catch (error) {
         console.error("Error fetching listings:", error);
         res.status(500).send({ message: "Internal Server Error" });
