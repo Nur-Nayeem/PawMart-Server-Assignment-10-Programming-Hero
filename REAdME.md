@@ -1,56 +1,72 @@
 # PawMart 🐾
 
-**Live Site:** [[PawMart Website](https://pawsmart-79833.web.app)]
+## Project Overview
 
-PawMart is a modern React-based marketplace for pets and pet-related products, designed to help pet lovers adopt pets, buy pet food, accessories, and care products, all in one place.
+PawMart is a modern React-based pet marketplace designed to make pet adoption easier and provide a centralized shop for pet food, accessories, toys, and care essentials—with authentication and smooth user interactions.
 
-## Features
+## Project Image
 
-- **Multiple Categories:**
+<img src="https://i.ibb.co.com/dJWhm3sm/rsz-1screenshot-from-2025-11-19-00-29-02.jpg" width="100%" height="350" />
 
-  - **Pets** – Browse pets available for adoption (adoption price is free).
-  - **Pet Food** – Purchase various types of pet food.
-  - **Accessories** – Find toys, collars, beds, and more.
-  - **Pet Care Products** – Shop for grooming and health products.
+---
 
-- **User Authentication:**
+## 🚀 Main Features
 
-  - Secure login and signup using **Firebase Email & Password**.
-  - **Google Sign-In** integration for faster login.
+### 🐾 Pet Marketplace
 
-- **CRUD Operations for Listings:**
+- Browse pets available for **free adoption**
+- Explore a wide range of **pet food**, **accessories**, and **care products**
+- Category-wise product browsing for a smoother and more intuitive experience
 
-  - Authenticated users can **create, update, and delete** their listings.
-  - Users can place **orders** or adopt pets securely.
-  - **Node.js + Express** backend with **MongoDB** database.
-  - **Secure API routes** using Firebase Admin SDK and `verifyUser` middleware.
+### 🔐 User Authentication & Security
 
-- **Modern UI/UX:**
+- Firebase **Email/Password** authentication
+- **Google Sign-In** support for quick access
+- Protected routes ensuring only authorized users can access specific pages
 
-  - **Dark and Light Mode** toggle for user comfort.
-  - Built with **React**, **Tailwind CSS**, and **DaisyUI**.
-  - Smooth Scrolling animations using **Framer Motion** and interactive carousels via **Swiper**.
+### ✏️ Listing & Management (CRUD)
 
-- **Additional Features:**
-  - PDF Order reports generation.
-  - Beautiful alerts with **SweetAlert2**.
-  - Dynamic effects with **React Icons** and **Typewriter** animations.
-  - API calls handled seamlessly with **Axios**.
+- Users can **add**, **edit**, and **delete** their own listings
+- Secure adoption and ordering system integrated with backend
+- User-specific dashboard for managing uploaded listings
 
-## Tech Stack
+### 🛒 Order & Adoption System
+
+- Easy and efficient pet adoption and ordering process
+- Order information stored securely in the database
+- Smooth and responsive UI for seamless user experience
+
+### 📄 Reports & Downloads
+
+- **PDF report generation** for user orders
+- Clean and professional report layout using jsPDF and AutoTable
+
+---
+
+## 🛠️ Tech Stack
 
 - **Frontend:** React, Tailwind CSS, DaisyUI
 - **Backend:** Node.js, Express.js
 - **Database:** MongoDB
 - **Authentication:** Firebase Auth (Email/Password & Google)
 
-## 📦 NPM Packages Used For Backend
+---
 
-- mongodb
-- firebase-admin
-- express
-- cors
-- dotenv
+## 📦 NPM Packages Used
+
+- tailwindcss
+- daisyui
+- react-router
+- firebase
+- swiper
+- framer motion
+- react-icons
+- axios
+- SweetAlert2
+- jspdf-autotable
+- Typewriter
+
+---
 
 ## How to Run Locally
 
@@ -71,7 +87,26 @@ PawMart is a modern React-based marketplace for pets and pet-related products, d
    cd PawMart-Server-Assignment-10-Programming-Hero && npm install
    ```
 
-3. Add .env in server folder with Firebase Admin credentials and MongoDB URI.
+3. Add .env in client and server folder with Firebase Admin credentials and MongoDB URI.
+
+client (.env):
+
+```bash
+  VITE_FB_apiKey=your-firebase-api-key
+  VITE_FB_authDomain=your-firebase-authDomain
+  VITE_FB_projectId=your-firebase-projectId
+  VITE_FB_storageBucket=your-firebase-storageBucket
+  VITE_FB_messagingSenderId=your-firebase-messagingSenderId
+  VITE_FB_appId=your-firebase-appId
+```
+
+Server (.env):
+
+```bash
+   PORT=your-port
+   MONGODB_URI=your-mongodb-uri
+   FIREBASE_SERVICE_KEY= (base64 encoded JSON)
+```
 
 4. Start server:
    ```bash
@@ -83,4 +118,10 @@ PawMart is a modern React-based marketplace for pets and pet-related products, d
    npm run dev
    ```
 
-6. Visit http://localhost:5173 in your browser.
+---
+
+### **🌍 Live Website:** [PawMart Website](https://pawsmart-79833.web.app)
+
+### **💻 Client GitHub Repo:** [Client Repo](https://github.com/Nur-Nayeem/PawMart-Client-Assignment-10-Programming-Hero)
+
+### **🛢️ Server GitHub Repo:** [Server Repo](https://github.com/Nur-Nayeem/PawMart-Server-Assignment-10-Programming-Hero)
